@@ -17,7 +17,7 @@ export const Header = ({ onUploadClick, searchQuery, onSearchChange }: HeaderPro
             <Cloud className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Video Manager</h1>
+            <h1 className="text-xl font-bold text-foreground">AutoSpotr</h1>
             <p className="text-xs text-muted-foreground">Google Cloud Platform</p>
           </div>
         </div>
