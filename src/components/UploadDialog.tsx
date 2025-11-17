@@ -40,13 +40,13 @@ export const UploadDialog = ({ open, onOpenChange }: UploadDialogProps) => {
     if (files.length > 0) {
       toast({
         title: "Upload Started",
-        description: `Uploading ${files.length} video${files.length > 1 ? 's' : ''} to Google Cloud Storage...`,
+        description: `Uploading ${files.length} car video${files.length > 1 ? 's' : ''} to Google Cloud Storage...`,
       });
       // Simulate upload
       setTimeout(() => {
         toast({
           title: "Upload Complete",
-          description: "Videos have been uploaded successfully.",
+          description: "Car videos have been uploaded successfully.",
         });
         onOpenChange(false);
       }, 2000);
@@ -58,12 +58,12 @@ export const UploadDialog = ({ open, onOpenChange }: UploadDialogProps) => {
     if (files.length > 0) {
       toast({
         title: "Upload Started",
-        description: `Uploading ${files.length} video${files.length > 1 ? 's' : ''} to Google Cloud Storage...`,
+        description: `Uploading ${files.length} car video${files.length > 1 ? 's' : ''} to Google Cloud Storage...`,
       });
       setTimeout(() => {
         toast({
           title: "Upload Complete",
-          description: "Videos have been uploaded successfully.",
+          description: "Car videos have been uploaded successfully.",
         });
         onOpenChange(false);
       }, 2000);
@@ -74,9 +74,9 @@ export const UploadDialog = ({ open, onOpenChange }: UploadDialogProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Upload Videos</DialogTitle>
+          <DialogTitle>Upload Car Videos</DialogTitle>
           <DialogDescription>
-            Upload your videos to Google Cloud Storage
+            Upload your car spotting videos to Google Cloud Storage
           </DialogDescription>
         </DialogHeader>
         
@@ -92,7 +92,7 @@ export const UploadDialog = ({ open, onOpenChange }: UploadDialogProps) => {
         >
           <FileVideo className="h-16 w-16 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold text-foreground mb-2">
-            Drag and drop videos here
+            Drag and drop car videos here
           </h3>
           <p className="text-sm text-muted-foreground mb-6">
             or click to browse files
