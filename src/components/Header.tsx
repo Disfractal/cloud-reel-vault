@@ -19,7 +19,7 @@ export const Header = ({
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">AutoSpotr</h1>
-            <p className="text-xs text-muted-foreground">Video Management System
+            <p className="text-xs text-muted-foreground">Car Spotting Platform
 
 
 
@@ -32,7 +32,7 @@ export const Header = ({
         <div className="flex flex-1 items-center justify-end gap-4 max-w-2xl mx-auto px-4">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input type="search" placeholder="Search videos..." value={searchQuery} onChange={e => onSearchChange(e.target.value)} className="pl-9" />
+            <Input type="search" placeholder="Search cars..." value={searchQuery} onChange={e => onSearchChange(e.target.value)} className="pl-9" />
           </div>
           <Button onClick={onUploadClick} className="gap-2">
             <Upload className="h-4 w-4" />
