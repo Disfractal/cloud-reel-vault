@@ -7,5 +7,5 @@ steps:
   args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--site', '${_FIREBASE_SITE_ID}', '--only', 'hosting']
 options:
   logging: CLOUD_LOGGING_ONLY
-#  env:
-#    - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # This token needs to be securely managed, e.g., via Cloud Build secrets
+env:
+   - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # This token needs to be securely managed, e.g., via Cloud Build secrets
