@@ -7,12 +7,12 @@ steps:
   args: ['run', 'build'] # Or your specific build command
 
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['install', 'g', 'firebase-tools']
+  args: ['install', '--save-dev', 'firebase-tools']
 
-- name: 'firebase/firebase-tools'
-  args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--site', '${_FIREBASE_SITE_ID}', '--only', 'hosting']
-  
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'firebase', 'deploy', '--token', '${_FIREBASE_TOKEN}', '--project', '${_FIREBASE_PROJECT_ID}', '--site', '${_FIREBASE_SITE_ID}', '--only', 'hosting']
+  env:
+    - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # Pass the token from the secret
+
 options:
   logging: CLOUD_LOGGING_ONLY
-  env:
-     - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # This token needs to be securely managed, e.g., via Cloud Build secrets
