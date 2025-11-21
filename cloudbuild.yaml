@@ -10,7 +10,7 @@ steps:
 #   args: ['install', '--save-dev', 'firebase-tools']
 
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['install', '--save-dev', 'firebase-tools']
+  args: ['install', '-g', 'firebase-tools']
 
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'firebase', 'deploy', '--project', '--token', '${_FIREBASE_TOKEN}']
