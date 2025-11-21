@@ -1,11 +1,16 @@
 steps:
+
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install']
+
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build'] # Or your specific build command
-- name: 'firebase/firebase-tools'
+
+- name: "gcr.io/cloud-builders/firebase"
   args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--site', '${_FIREBASE_SITE_ID}', '--only', 'hosting']
+
 options:
   logging: CLOUD_LOGGING_ONLY
-env:
-   - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # This token needs to be securely managed, e.g., via Cloud Build secrets
+
+# env:
+#    - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # This token needs to be securely managed, e.g., via Cloud Build secrets
