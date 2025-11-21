@@ -14,5 +14,5 @@ steps:
   
 options:
   logging: CLOUD_LOGGING_ONLY
-# env:
-#    - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # This token needs to be securely managed, e.g., via Cloud Build secrets
+  env:
+     - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # This token needs to be securely managed, e.g., via Cloud Build secrets
