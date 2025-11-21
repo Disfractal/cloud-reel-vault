@@ -10,7 +10,7 @@ steps:
 #   args: ['install', '--save-dev', 'firebase-tools']
 
 - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
-  args: ['deploy', '--token', '${_FIREBASE_TOKEN}', '--project', '${_FIREBASE_PROJECT_ID}', '--site', '${_FIREBASE_SITE_ID}', '--only', 'hosting']
+  args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--site', '${_FIREBASE_SITE_ID}', '--only', 'hosting']
   env:
     - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # Pass the token from the secret
 
