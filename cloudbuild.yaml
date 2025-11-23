@@ -21,14 +21,14 @@ steps:
 # - name: 'gcr.io/cloud-builders/firebase'
 #   args: ['deploy', '--only', 'hosting', '--project', '${PROJECT_ID}']
 
-- name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
-  args: ['target:apply', 'hosting', 'dev_vms', 'dev-fb-autospotr-vms-hosting-b12w2']
+# - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
+#   args: ['target:apply', 'hosting', 'dev_vms', 'dev-fb-autospotr-vms-hosting-b12w2']
 
-- name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
-  args: ['target:apply', 'hosting', 'dev_game', 'dev-fb-autospotr-game-hosting-b12w2']
+# - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
+#   args: ['target:apply', 'hosting', 'dev_game', 'dev-fb-autospotr-game-hosting-b12w2']
 
-- name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
-  args: ['target']
+# - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
+#   args: ['target']
 
 - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
   args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--only', 'hosting:dev_vms']

@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "autospotr"
-  }
+  },
+  "targets": {
+    "autospotr": {
+      "hosting": {
+        "dev_vms": [
+          "dev-fb-autospotr-vms-hosting-b12w2"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
