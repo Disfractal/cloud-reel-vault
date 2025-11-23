@@ -1,4 +1,7 @@
 steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args: ['-c', 'ls -la && pwd']
 
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install']
@@ -31,7 +34,7 @@ steps:
 #   args: ['target']
 
 - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
-  args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--only', 'hosting:dev_vms']
+  args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--only', 'hosting:${_FIREBASE_ENV}']
   env:
     - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # Pass the token from the secret
 
