@@ -28,6 +28,9 @@ steps:
   args: ['target:apply', 'hosting', 'dev_game', 'dev-fb-autospotr-game-hosting-b12w2']
 
 - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
+  args: ['target']
+
+- name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
   args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--only', 'hosting:dev_vms']
   env:
     - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # Pass the token from the secret
