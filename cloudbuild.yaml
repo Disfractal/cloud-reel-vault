@@ -32,8 +32,8 @@ steps:
 
 - name: 'us-docker.pkg.dev/firebase-cli/us/firebase'
   args: ['deploy', '--project', '${_FIREBASE_PROJECT_ID}', '--only', 'hosting:dev_vms']
-  env:
-    - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # Pass the token from the secret
+  # env:
+  #   - 'FIREBASE_TOKEN=${_FIREBASE_TOKEN}' # Pass the token from the secret
 
 options:
   logging: CLOUD_LOGGING_ONLY
