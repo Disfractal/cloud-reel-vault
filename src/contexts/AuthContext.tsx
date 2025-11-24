@@ -71,7 +71,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Fetch user profile from Firestore
         const profileDoc = await getDoc(doc(db, collections.users, user.uid));
         if (profileDoc.exists()) {
-          setUserProfile(profileDoc.data() as UserProfile);
+          const profile = profileDoc.data() as UserProfile;
+          
+          // Sync emailVerified status from Firebase Auth to Firestore
+          if (profile.emailVerified !== user.emailVerified) {
+            await setDoc(
+              doc(db, collections.users, user.uid),
+              { emailVerified: user.emailVerified, updatedOn: new Date() },
+              { merge: true }
+            );
+            profile.emailVerified = user.emailVerified;
+          }
+          
+          setUserProfile(profile);
         }
         
         // Load user roles
