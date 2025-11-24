@@ -73,14 +73,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (profileDoc.exists()) {
           const profile = profileDoc.data() as UserProfile;
           
-          // Sync emailVerified status from Firebase Auth to Firestore
-          if (profile.emailVerified !== user.emailVerified) {
+          // Only sync emailVerified from Firebase Auth to Firestore when it changes to true
+          // This prevents automatic verification but allows verification after clicking email link
+          if (!profile.emailVerified && user.emailVerified) {
             await setDoc(
               doc(db, collections.users, user.uid),
-              { emailVerified: user.emailVerified, updatedOn: new Date() },
+              { emailVerified: true, updatedOn: new Date() },
               { merge: true }
             );
-            profile.emailVerified = user.emailVerified;
+            profile.emailVerified = true;
           }
           
           setUserProfile(profile);
