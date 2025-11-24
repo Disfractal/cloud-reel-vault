@@ -1,5 +1,10 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { sendEmailVerification } from "firebase/auth";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Mail } from "lucide-react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -7,6 +12,30 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
+  const [resending, setResending] = useState(false);
+  const { toast } = useToast();
+
+  const handleResendVerification = async () => {
+    if (!user) return;
+
+    setResending(true);
+    try {
+      await sendEmailVerification(user);
+      toast({
+        title: "Verification email sent",
+        description: "Please check your inbox for the verification link.",
+      });
+    } catch (error: any) {
+      console.error("Error sending verification email:", error);
+      toast({
+        title: "Failed to send email",
+        description: error.message || "Could not send verification email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResending(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -35,6 +64,16 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           <p className="text-sm text-muted-foreground">
             Check your inbox and click the verification link. Once verified, refresh this page to continue.
           </p>
+          <div className="pt-4">
+            <Button 
+              onClick={handleResendVerification} 
+              disabled={resending}
+              className="gap-2"
+            >
+              <Mail className="h-4 w-4" />
+              {resending ? "Sending..." : "Resend Verification Email"}
+            </Button>
+          </div>
         </div>
       </div>
     );
