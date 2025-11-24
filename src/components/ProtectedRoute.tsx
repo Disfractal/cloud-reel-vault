@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const [resending, setResending] = useState(false);
   const { toast } = useToast();
 
@@ -49,8 +49,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check if user has verified their email
-  if (!user.emailVerified) {
+  // Check if user has verified their email using Firestore profile data
+  if (userProfile && !userProfile.emailVerified) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="max-w-md p-8 text-center space-y-4">
