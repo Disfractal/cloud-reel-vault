@@ -56,7 +56,8 @@ const MakeDetail = () => {
           collections.autoModels,
           [where("makeName", "==", make.name.toLowerCase())]
         );
-        setModels(modelsData);
+        const sortedModels = modelsData.sort((a, b) => a.name.localeCompare(b.name));
+        setModels(sortedModels);
       } catch (error) {
         console.error("Error fetching models:", error);
         toast({
