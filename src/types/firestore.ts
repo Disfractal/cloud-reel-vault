@@ -9,7 +9,6 @@ export interface User {
   locale?: string;
   email: string;
   emailVerified: boolean;
-  approved: boolean;
   sub: string;
   updatedOn: Timestamp;
   createdOn: Timestamp;
