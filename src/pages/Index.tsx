@@ -123,7 +123,7 @@ const Index = () => {
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground">Car Makes</h2>
             <p className="text-muted-foreground">
-              {filteredMakes.length} car {filteredMakes.length !== 1 ? "makes" : "make"} in database
+              {filteredMakes.length} Makes
             </p>
           </div>
         )}
