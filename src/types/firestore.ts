@@ -18,6 +18,7 @@ export interface AutoMake {
   id: string;
   name: string;
   logoImage?: string;
+  heroImage?: string;
   foundedYear?: number;
   updatedOn: Timestamp;
   createdOn: Timestamp;
