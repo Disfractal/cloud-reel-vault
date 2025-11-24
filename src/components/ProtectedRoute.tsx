@@ -1,10 +1,10 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { sendEmailVerification } from "firebase/auth";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, RefreshCw } from "lucide-react";
+import { Mail } from "lucide-react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,39 +13,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, userProfile, loading } = useAuth();
   const [resending, setResending] = useState(false);
-  const [checking, setChecking] = useState(false);
   const { toast } = useToast();
-
-  // Automatically check for email verification every 5 seconds
-  useEffect(() => {
-    if (!user || !userProfile || userProfile.emailVerified) {
-      return;
-    }
-
-    const checkVerification = async () => {
-      try {
-        await user.reload();
-        if (user.emailVerified) {
-          toast({
-            title: "Email verified!",
-            description: "Your email has been verified. Redirecting...",
-          });
-          // Trigger a page reload to update the user profile
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error("Error checking verification status:", error);
-      }
-    };
-
-    // Check immediately on mount
-    checkVerification();
-
-    // Then check every 5 seconds
-    const interval = setInterval(checkVerification, 5000);
-
-    return () => clearInterval(interval);
-  }, [user, userProfile, toast]);
 
   const handleResendVerification = async () => {
     if (!user) return;
@@ -66,37 +34,6 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       });
     } finally {
       setResending(false);
-    }
-  };
-
-  const handleManualCheck = async () => {
-    if (!user) return;
-
-    setChecking(true);
-    try {
-      await user.reload();
-      if (user.emailVerified) {
-        toast({
-          title: "Email verified!",
-          description: "Your email has been verified. Redirecting...",
-        });
-        window.location.reload();
-      } else {
-        toast({
-          title: "Not verified yet",
-          description: "Please check your email and click the verification link.",
-          variant: "default",
-        });
-      }
-    } catch (error: any) {
-      console.error("Error checking verification:", error);
-      toast({
-        title: "Check failed",
-        description: "Could not check verification status. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setChecking(false);
     }
   };
 
@@ -125,22 +62,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
             {user.email}
           </p>
           <p className="text-sm text-muted-foreground">
-            Check your inbox and click the verification link. This page will automatically refresh when you verify your email.
+            Check your inbox and click the verification link. Once verified, refresh this page to continue.
           </p>
-          <div className="flex flex-col gap-2 pt-4">
-            <Button 
-              onClick={handleManualCheck} 
-              disabled={checking}
-              variant="default"
-              className="gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${checking ? 'animate-spin' : ''}`} />
-              {checking ? "Checking..." : "I've Verified - Check Now"}
-            </Button>
+          <div className="pt-4">
             <Button 
               onClick={handleResendVerification} 
               disabled={resending}
-              variant="outline"
               className="gap-2"
             >
               <Mail className="h-4 w-4" />
