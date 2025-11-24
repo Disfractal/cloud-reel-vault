@@ -51,7 +51,7 @@ export function HeroImageUpload({
 
     try {
       // Upload to Firebase Storage
-      const storageRef = ref(storage, `make-heroes/${makeId}-${Date.now()}`);
+      const storageRef = ref(storage, `gs://dev-autospotr-images/make-heroes/${makeId}-${Date.now()}`);
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
 
