@@ -67,8 +67,9 @@ const mockVideos = [
 const Index = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [videos, setVideos] = useState(mockVideos);
+  const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showImporter, setShowImporter] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -88,10 +89,11 @@ const Index = () => {
           }));
           setVideos(transformedVideos);
         } else {
-          // Fallback to mock data if Firestore is empty
+          // Show importer if Firestore is empty
+          setShowImporter(true);
           toast({
-            title: "No clips found",
-            description: "Database is empty. Showing sample data. Use the upload button to add clips.",
+            title: "No data found",
+            description: "Click 'Start Import' below to import your car data from SQL.",
             variant: "default",
           });
         }
@@ -130,24 +132,26 @@ const Index = () => {
       />
 
       <main className="container px-4 py-8 md:px-6">
-        {videos.length === 0 && !loading && (
-          <div className="mb-8">
+        {showImporter && !loading && (
+          <div className="mb-8 flex justify-center">
             <DataImporter />
           </div>
         )}
         
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-foreground">Car Spotting Collection</h2>
-          <p className="text-muted-foreground">
-            {filteredVideos.length} car video{filteredVideos.length !== 1 ? "s" : ""} stored in Google Cloud Storage
-          </p>
-        </div>
+        {!showImporter && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Car Spotting Collection</h2>
+            <p className="text-muted-foreground">
+              {filteredVideos.length} car video{filteredVideos.length !== 1 ? "s" : ""} stored in Google Cloud Storage
+            </p>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex min-h-[400px] items-center justify-center">
             <p className="text-lg text-muted-foreground">Loading cars...</p>
           </div>
-        ) : filteredVideos.length === 0 ? (
+        ) : !showImporter && filteredVideos.length === 0 ? (
           <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-dashed">
             <div className="text-center">
               <p className="text-lg font-medium text-muted-foreground">No car videos found</p>
