@@ -3,8 +3,8 @@ import { Header } from "@/components/Header";
 import { VideoCard } from "@/components/VideoCard";
 import { UploadDialog } from "@/components/UploadDialog";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { getAllClips } from "@/lib/firestore-helpers";
+import type { Clip } from "@/types/firestore";
 import videoThumb1 from "@/assets/video-thumb-1.jpg";
 import videoThumb2 from "@/assets/video-thumb-2.jpg";
 import videoThumb3 from "@/assets/video-thumb-3.jpg";
@@ -71,30 +71,42 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchCars = async () => {
+    const fetchClips = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "cars"));
-        const carsData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as typeof mockVideos;
+        const clips = await getAllClips();
         
-        if (carsData.length > 0) {
-          setVideos(carsData);
+        if (clips.length > 0) {
+          // Transform Firestore clips to video format
+          const transformedVideos = clips.map(clip => ({
+            id: clip.id,
+            title: `${clip.makeName} ${clip.modelName} ${clip.trimName}`,
+            thumbnail: clip.makeLogoImage || "/placeholder.svg",
+            duration: clip.duration || "0:00",
+            size: clip.size || "0 MB",
+            uploadDate: clip.createdOn?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+          }));
+          setVideos(transformedVideos);
+        } else {
+          // Fallback to mock data if Firestore is empty
+          toast({
+            title: "No clips found",
+            description: "Database is empty. Showing sample data. Use the upload button to add clips.",
+            variant: "default",
+          });
         }
       } catch (error) {
-        console.error("Error fetching cars:", error);
+        console.error("Error fetching clips:", error);
         toast({
-          title: "Error",
-          description: "Failed to load cars from Firebase. Using local data.",
-          variant: "destructive",
+          title: "Using sample data",
+          description: "Could not connect to database, showing sample videos.",
+          variant: "default",
         });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCars();
+    fetchClips();
   }, [toast]);
 
   const filteredVideos = videos.filter((video) =>
