@@ -1,7 +1,7 @@
 {
   "projects": {},
   "targets": {
-    "autospotr": {
+    "terraform-autosport-test4": {
       "hosting": {
         "dev-vms": [
           "dev-fb-autospotr-vms-hosting-b13w2"
