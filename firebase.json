@@ -1,6 +1,6 @@
 {
-  "hosting": [{
-    "target": "dev-vms",
+  "hosting": {
+    "target": "dev_vms",
     "public": "dist",
     "ignore": [
       "firebase.json",
@@ -13,5 +13,5 @@
         "destination": "/index.html"
       }
     ]
-  }]
+  }
 }
