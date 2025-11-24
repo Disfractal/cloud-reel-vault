@@ -91,7 +91,7 @@ const Index = () => {
   }, [toast]);
   const filteredMakes = makes.filter(make => make.name.toLowerCase().includes(searchQuery.toLowerCase()));
   return <div className="min-h-screen bg-background">
-      <Header onUploadClick={() => {}} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       <main className="container px-4 py-8 md:px-6">
         {showImporter && !loading && <div className="mb-8 flex justify-center">
