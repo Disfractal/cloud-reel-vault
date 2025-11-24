@@ -21,7 +21,7 @@ export async function importDataToFirestore(sqlContent: string) {
 
 async function importMakes(makes: ParsedMake[]) {
   const makeIds = new Map<string, string>();
-  const batch = writeBatch(db);
+  let batch = writeBatch(db);
   let batchCount = 0;
   
   // Check if makes already exist
@@ -29,6 +29,11 @@ async function importMakes(makes: ParsedMake[]) {
   const existingMakeNames = new Set(existingMakes.docs.map(doc => doc.data().name));
   
   for (const make of makes) {
+    // Skip empty names
+    if (!make.name || make.name.trim() === '') {
+      continue;
+    }
+    
     // Skip if already exists
     if (existingMakeNames.has(make.name)) {
       const existingDoc = existingMakes.docs.find(doc => doc.data().name === make.name);
@@ -53,6 +58,7 @@ async function importMakes(makes: ParsedMake[]) {
     // Firestore batch limit is 500
     if (batchCount >= 450) {
       await batch.commit();
+      batch = writeBatch(db); // Create new batch
       batchCount = 0;
     }
   }
@@ -68,7 +74,7 @@ async function importModels(
   models: ParsedModel[],
   makeIds: Map<string, string>
 ) {
-  const batch = writeBatch(db);
+  let batch = writeBatch(db);
   let batchCount = 0;
   
   // Check if models already exist
@@ -106,6 +112,7 @@ async function importModels(
     // Firestore batch limit is 500
     if (batchCount >= 450) {
       await batch.commit();
+      batch = writeBatch(db); // Create new batch
       batchCount = 0;
     }
   }
