@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { VideoCard } from "@/components/VideoCard";
-import { UploadDialog } from "@/components/UploadDialog";
+import { MakeCard } from "@/components/MakeCard";
 import { DataImporter } from "@/components/DataImporter";
 import { useToast } from "@/hooks/use-toast";
-import { getAllClips } from "@/lib/firestore-helpers";
-import type { Clip } from "@/types/firestore";
+import { getAllMakes } from "@/lib/firestore-helpers";
+import type { AutoMake } from "@/types/firestore";
 import videoThumb1 from "@/assets/video-thumb-1.jpg";
 import videoThumb2 from "@/assets/video-thumb-2.jpg";
 import videoThumb3 from "@/assets/video-thumb-3.jpg";
@@ -65,31 +64,20 @@ const mockVideos = [
 ];
 
 const Index = () => {
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [videos, setVideos] = useState<any[]>([]);
+  const [makes, setMakes] = useState<AutoMake[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImporter, setShowImporter] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchClips = async () => {
+    const fetchMakes = async () => {
       try {
-        const clips = await getAllClips();
+        const makesData = await getAllMakes();
         
-        if (clips.length > 0) {
-          // Transform Firestore clips to video format
-          const transformedVideos = clips.map(clip => ({
-            id: clip.id,
-            title: `${clip.makeName} ${clip.modelName} ${clip.trimName}`,
-            thumbnail: clip.makeLogoImage || "/placeholder.svg",
-            duration: clip.duration || "0:00",
-            size: clip.size || "0 MB",
-            uploadDate: clip.createdOn?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
-          }));
-          setVideos(transformedVideos);
+        if (makesData.length > 0) {
+          setMakes(makesData);
         } else {
-          // Show importer if Firestore is empty
           setShowImporter(true);
           toast({
             title: "No data found",
@@ -98,35 +86,28 @@ const Index = () => {
           });
         }
       } catch (error) {
-        console.error("Error fetching clips:", error);
+        console.error("Error fetching makes:", error);
         toast({
-          title: "Using sample data",
-          description: "Could not connect to database, showing sample videos.",
-          variant: "default",
+          title: "Database connection error",
+          description: "Could not load car makes from the database.",
+          variant: "destructive",
         });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchClips();
+    fetchMakes();
   }, [toast]);
 
-  const filteredVideos = videos.filter((video) =>
-    video.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredMakes = makes.filter((make) =>
+    make.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const handleVideoPlay = (videoTitle: string) => {
-    toast({
-      title: "Playing Car Video",
-      description: videoTitle,
-    });
-  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header
-        onUploadClick={() => setUploadDialogOpen(true)}
+        onUploadClick={() => {}}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
@@ -140,38 +121,32 @@ const Index = () => {
         
         {!showImporter && (
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Car Spotting Collection</h2>
+            <h2 className="text-2xl font-bold text-foreground">Car Makes</h2>
             <p className="text-muted-foreground">
-              {filteredVideos.length} car video{filteredVideos.length !== 1 ? "s" : ""} stored in Google Cloud Storage
+              {filteredMakes.length} car {filteredMakes.length !== 1 ? "makes" : "make"} in database
             </p>
           </div>
         )}
 
         {loading ? (
           <div className="flex min-h-[400px] items-center justify-center">
-            <p className="text-lg text-muted-foreground">Loading cars...</p>
+            <p className="text-lg text-muted-foreground">Loading car makes...</p>
           </div>
-        ) : !showImporter && filteredVideos.length === 0 ? (
+        ) : !showImporter && filteredMakes.length === 0 ? (
           <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-dashed">
             <div className="text-center">
-              <p className="text-lg font-medium text-muted-foreground">No car videos found</p>
+              <p className="text-lg font-medium text-muted-foreground">No car makes found</p>
               <p className="text-sm text-muted-foreground">Try a different search term</p>
             </div>
           </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredVideos.map((video) => (
-              <VideoCard
-                key={video.id}
-                video={video}
-                onPlay={() => handleVideoPlay(video.title)}
-              />
+        ) : !showImporter ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredMakes.map((make) => (
+              <MakeCard key={make.id} make={make} />
             ))}
           </div>
-        )}
+        ) : null}
       </main>
-
-      <UploadDialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen} />
     </div>
   );
 };
