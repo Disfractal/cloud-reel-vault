@@ -146,18 +146,20 @@ const MakeDetail = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {models.map((model) => (
-                  <Card key={model.id}>
-                    <CardHeader>
-                      <CardTitle className="capitalize">{model.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {(model.productionStartYear || model.productionEndYear) && (
-                        <p className="text-sm text-muted-foreground">
-                          {model.productionStartYear || '?'} - {model.productionEndYear || 'Present'}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
+                  <Link key={model.id} to={`/model/${model.id}`}>
+                    <Card className="hover:bg-accent transition-colors cursor-pointer">
+                      <CardHeader>
+                        <CardTitle className="capitalize">{model.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {(model.productionStartYear || model.productionEndYear) && (
+                          <p className="text-sm text-muted-foreground">
+                            {model.productionStartYear || '?'} - {model.productionEndYear || 'Present'}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             )}
