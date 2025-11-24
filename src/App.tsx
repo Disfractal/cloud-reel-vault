@@ -11,10 +11,8 @@ import ModelDetail from "./pages/ModelDetail";
 import Auth from "./pages/Auth";
 import Users from "./pages/Users";
 import UserDetail from "./pages/UserDetail";
+import InitAdmin from "./pages/InitAdmin";
 import NotFound from "./pages/NotFound";
-
-// Initialize admin role - run once
-import "@/lib/init-admin";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/init-admin" element={<InitAdmin />} />
             <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
             <Route path="/user/:userId" element={<ProtectedRoute><UserDetail /></ProtectedRoute>} />
             <Route path="/make/:makeId" element={<ProtectedRoute><MakeDetail /></ProtectedRoute>} />
