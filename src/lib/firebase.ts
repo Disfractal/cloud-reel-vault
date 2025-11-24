@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
+export const db = getFirestore(app, "dev-fb-autospotr-firestore");
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 export default app;
