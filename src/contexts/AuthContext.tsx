@@ -19,6 +19,7 @@ interface UserProfile {
   username?: string;
   picture?: string;
   emailVerified: boolean;
+  approved: boolean;
   createdOn: Date;
   updatedOn: Date;
 }
@@ -95,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email: user.email!,
       username: username || email.split("@")[0],
       emailVerified: user.emailVerified,
+      approved: false, // New users require admin approval
       createdOn: new Date(),
       updatedOn: new Date(),
     };

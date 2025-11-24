@@ -114,6 +114,8 @@ const AuditLogs = () => {
       [AuditEventType.ADMIN_INIT_FAILED_ALREADY_EXISTS]: "Admin Already Exists",
       [AuditEventType.ADMIN_INIT_FAILED_NOT_AUTHENTICATED]: "Not Authenticated",
       [AuditEventType.ADMIN_INIT_FAILED_ERROR]: "Initialization Error",
+      [AuditEventType.USER_APPROVED]: "User Approved",
+      [AuditEventType.USER_APPROVAL_REVOKED]: "Approval Revoked",
     };
     return labels[eventType] || eventType;
   };
