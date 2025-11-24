@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { collections } from "@/lib/firestore-helpers";
+import { getUserRoles, UserRole } from "@/lib/roles";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -15,6 +16,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Shield } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -24,6 +27,7 @@ interface UserProfile {
   lastName?: string;
   emailVerified: boolean;
   createdOn: Date;
+  roles?: UserRole[];
 }
 
 const Users = () => {
@@ -37,11 +41,21 @@ const Users = () => {
     const fetchUsers = async () => {
       try {
         const usersSnapshot = await getDocs(collection(db, collections.users));
-        const usersData = usersSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdOn: doc.data().createdOn?.toDate() || new Date(),
-        })) as UserProfile[];
+        const usersData = await Promise.all(
+          usersSnapshot.docs.map(async (doc) => {
+            const userData = {
+              id: doc.id,
+              ...doc.data(),
+              createdOn: doc.data().createdOn?.toDate() || new Date(),
+            } as UserProfile;
+            
+            // Fetch roles for each user
+            const roles = await getUserRoles(doc.id);
+            userData.roles = roles;
+            
+            return userData;
+          })
+        );
         
         setUsers(usersData);
       } catch (error) {
@@ -98,6 +112,7 @@ const Users = () => {
                       <TableHead>User</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Username</TableHead>
+                      <TableHead>Role</TableHead>
                       <TableHead>Email Verified</TableHead>
                       <TableHead>Joined</TableHead>
                     </TableRow>
@@ -127,6 +142,16 @@ const Users = () => {
                         </TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.username || '-'}</TableCell>
+                        <TableCell>
+                          {user.roles?.includes(UserRole.ADMIN) ? (
+                            <Badge variant="default" className="gap-1">
+                              <Shield className="h-3 w-3" />
+                              Admin
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground">User</span>
+                          )}
+                        </TableCell>
                         <TableCell>
                           <span className={user.emailVerified ? "text-green-600" : "text-muted-foreground"}>
                             {user.emailVerified ? 'Verified' : 'Not verified'}
