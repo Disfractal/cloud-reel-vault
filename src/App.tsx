@@ -13,6 +13,9 @@ import Users from "./pages/Users";
 import UserDetail from "./pages/UserDetail";
 import NotFound from "./pages/NotFound";
 
+// Initialize admin role - run once
+import "@/lib/init-admin";
+
 const queryClient = new QueryClient();
 
 const App = () => (
