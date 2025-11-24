@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { VideoCard } from "@/components/VideoCard";
 import { UploadDialog } from "@/components/UploadDialog";
+import { DataImporter } from "@/components/DataImporter";
 import { useToast } from "@/hooks/use-toast";
 import { getAllClips } from "@/lib/firestore-helpers";
 import type { Clip } from "@/types/firestore";
@@ -129,6 +130,12 @@ const Index = () => {
       />
 
       <main className="container px-4 py-8 md:px-6">
+        {videos.length === 0 && !loading && (
+          <div className="mb-8">
+            <DataImporter />
+          </div>
+        )}
+        
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-foreground">Car Spotting Collection</h2>
           <p className="text-muted-foreground">
