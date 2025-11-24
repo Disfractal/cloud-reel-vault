@@ -3,15 +3,9 @@
   "targets": {
     "terraform-autosport-test4": {
       "hosting": {
-        "dev": [
+        "dev-vms": [
           "dev-fb-autospotr-vms-hosting-b13w2"
-        ],
-        "stage": [
-          "stage-fb-autospotr-vms-hosting-b13w2"
-        ],
-        "prod": [
-          "prod-fb-autospotr-vms-hosting-b13w2"
-        ] 
+        ]
       }
     }
   },
