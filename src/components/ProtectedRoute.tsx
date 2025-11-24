@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, userProfile, loading } = useAuth();
+  const { user, userProfile, isAdmin, loading } = useAuth();
   const [resending, setResending] = useState(false);
   const { toast } = useToast();
 
@@ -74,6 +74,27 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
               {resending ? "Sending..." : "Resend Verification Email"}
             </Button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has admin role
+  if (userProfile && userProfile.emailVerified && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md p-8 text-center space-y-4">
+          <h2 className="text-2xl font-bold">Awaiting Admin Verification</h2>
+          <p className="text-muted-foreground">
+            Your account is currently being reviewed by an administrator.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Thank you for registering with AutoSpotr. An administrator will review 
+            your account shortly and grant you access to the application.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            You will be able to access the full application once your account has been approved.
+          </p>
         </div>
       </div>
     );
