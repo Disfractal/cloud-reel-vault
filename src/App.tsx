@@ -10,6 +10,7 @@ import MakeDetail from "./pages/MakeDetail";
 import ModelDetail from "./pages/ModelDetail";
 import Auth from "./pages/Auth";
 import Users from "./pages/Users";
+import UserDetail from "./pages/UserDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+            <Route path="/user/:userId" element={<ProtectedRoute><UserDetail /></ProtectedRoute>} />
             <Route path="/make/:makeId" element={<ProtectedRoute><MakeDetail /></ProtectedRoute>} />
             <Route path="/model/:modelId" element={<ProtectedRoute><ModelDetail /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

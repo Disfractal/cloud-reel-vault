@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -26,6 +27,7 @@ interface UserProfile {
 }
 
 const Users = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,7 +104,11 @@ const Users = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
+                      <TableRow 
+                        key={user.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/user/${user.id}`)}
+                      >
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar>
