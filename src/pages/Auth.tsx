@@ -13,7 +13,11 @@ import { ArrowLeft } from "lucide-react";
 const signUpSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  confirmPassword: z.string().min(1, { message: "Please confirm your password" }),
   username: z.string().trim().min(3, { message: "Username must be at least 3 characters" }).optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 const signInSchema = z.object({
@@ -37,6 +41,7 @@ const Auth = () => {
   const [signUpForm, setSignUpForm] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     username: "",
   });
 
@@ -218,6 +223,17 @@ const Auth = () => {
                       placeholder="••••••••"
                       value={signUpForm.password}
                       onChange={(e) => setSignUpForm({ ...signUpForm, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                    <Input
+                      id="signup-confirm-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={signUpForm.confirmPassword}
+                      onChange={(e) => setSignUpForm({ ...signUpForm, confirmPassword: e.target.value })}
                       required
                     />
                   </div>
