@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { VideoCard } from "@/components/VideoCard";
 import { UploadDialog } from "@/components/UploadDialog";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import videoThumb1 from "@/assets/video-thumb-1.jpg";
 import videoThumb2 from "@/assets/video-thumb-2.jpg";
 import videoThumb3 from "@/assets/video-thumb-3.jpg";
@@ -64,9 +66,38 @@ const mockVideos = [
 const Index = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [videos, setVideos] = useState(mockVideos);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const filteredVideos = mockVideos.filter((video) =>
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "cars"));
+        const carsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as typeof mockVideos;
+        
+        if (carsData.length > 0) {
+          setVideos(carsData);
+        }
+      } catch (error) {
+        console.error("Error fetching cars:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load cars from Firebase. Using local data.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, [toast]);
+
+  const filteredVideos = videos.filter((video) =>
     video.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -93,7 +124,11 @@ const Index = () => {
           </p>
         </div>
 
-        {filteredVideos.length === 0 ? (
+        {loading ? (
+          <div className="flex min-h-[400px] items-center justify-center">
+            <p className="text-lg text-muted-foreground">Loading cars...</p>
+          </div>
+        ) : filteredVideos.length === 0 ? (
           <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-dashed">
             <div className="text-center">
               <p className="text-lg font-medium text-muted-foreground">No car videos found</p>
