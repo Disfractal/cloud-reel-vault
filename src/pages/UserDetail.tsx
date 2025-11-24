@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { collections } from "@/lib/firestore-helpers";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserRoles, addUserRole, removeUserRole, UserRole } from "@/lib/roles";
+import { logUserApproved, logUserApprovalRevoked } from "@/lib/security-audit";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Mail, User, Calendar, CheckCircle, XCircle, Shield } from "lucide-react";
+import { ArrowLeft, Mail, User, Calendar, CheckCircle, XCircle, Shield, UserCheck, UserX } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -21,6 +22,7 @@ interface UserProfile {
   lastName?: string;
   picture?: string;
   emailVerified: boolean;
+  approved: boolean;
   createdOn: Date;
   updatedOn: Date;
 }
@@ -28,12 +30,13 @@ interface UserProfile {
 const UserDetail = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
-  const { isAdmin, refreshRoles } = useAuth();
+  const { user: currentUser, userProfile, isAdmin, refreshRoles } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<UserProfile | null>(null);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingRole, setUpdatingRole] = useState(false);
+  const [updatingApproval, setUpdatingApproval] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -120,6 +123,45 @@ const UserDetail = () => {
     }
   };
 
+  const handleToggleApproval = async () => {
+    if (!userId || !user || !currentUser || !userProfile) return;
+
+    setUpdatingApproval(true);
+    try {
+      const newApprovalStatus = !user.approved;
+      
+      await updateDoc(doc(db, collections.users, userId), {
+        approved: newApprovalStatus,
+        updatedOn: new Date(),
+      });
+
+      // Log the approval/revocation event
+      if (newApprovalStatus) {
+        await logUserApproved(userId, user.email, currentUser.uid, userProfile.email);
+      } else {
+        await logUserApprovalRevoked(userId, user.email, currentUser.uid, userProfile.email);
+      }
+
+      setUser({ ...user, approved: newApprovalStatus });
+      
+      toast({
+        title: newApprovalStatus ? "User approved" : "User approval revoked",
+        description: newApprovalStatus
+          ? `${user.username || user.email} can now access the application.`
+          : `${user.username || user.email} can no longer access the application.`,
+      });
+    } catch (error) {
+      console.error("Error updating approval status:", error);
+      toast({
+        title: "Error updating approval",
+        description: "Could not update user approval status. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingApproval(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -161,7 +203,7 @@ const UserDetail = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <CardTitle className="text-3xl">
                       {user.firstName && user.lastName
                         ? `${user.firstName} ${user.lastName}`
@@ -173,6 +215,18 @@ const UserDetail = () => {
                         Admin
                       </Badge>
                     )}
+                    {!user.approved && (
+                      <Badge variant="secondary" className="gap-1">
+                        <UserX className="h-3 w-3" />
+                        Pending Approval
+                      </Badge>
+                    )}
+                    {user.approved && (
+                      <Badge variant="outline" className="gap-1">
+                        <UserCheck className="h-3 w-3" />
+                        Approved
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-muted-foreground mt-1">
                     User ID: {user.id}
@@ -181,19 +235,35 @@ const UserDetail = () => {
               </div>
               
               {isAdmin && (
-                <Button
-                  variant={roles.includes(UserRole.ADMIN) ? "destructive" : "default"}
-                  onClick={handleToggleAdminRole}
-                  disabled={updatingRole}
-                  className="gap-2"
-                >
-                  <Shield className="h-4 w-4" />
-                  {updatingRole
-                    ? "Updating..."
-                    : roles.includes(UserRole.ADMIN)
-                    ? "Remove Admin"
-                    : "Make Admin"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant={user.approved ? "outline" : "default"}
+                    onClick={handleToggleApproval}
+                    disabled={updatingApproval}
+                    className="gap-2"
+                  >
+                    {user.approved ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                    {updatingApproval
+                      ? "Updating..."
+                      : user.approved
+                      ? "Revoke Access"
+                      : "Approve User"}
+                  </Button>
+                  
+                  <Button
+                    variant={roles.includes(UserRole.ADMIN) ? "destructive" : "default"}
+                    onClick={handleToggleAdminRole}
+                    disabled={updatingRole}
+                    className="gap-2"
+                  >
+                    <Shield className="h-4 w-4" />
+                    {updatingRole
+                      ? "Updating..."
+                      : roles.includes(UserRole.ADMIN)
+                      ? "Remove Admin"
+                      : "Make Admin"}
+                  </Button>
+                </div>
               )}
             </div>
           </CardHeader>

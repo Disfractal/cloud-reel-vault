@@ -7,6 +7,8 @@ export enum AuditEventType {
   ADMIN_INIT_FAILED_ALREADY_EXISTS = "admin_init_failed_already_exists",
   ADMIN_INIT_FAILED_NOT_AUTHENTICATED = "admin_init_failed_not_authenticated",
   ADMIN_INIT_FAILED_ERROR = "admin_init_failed_error",
+  USER_APPROVED = "user_approved",
+  USER_APPROVAL_REVOKED = "user_approval_revoked",
 }
 
 export interface AuditLog {
@@ -129,5 +131,41 @@ export async function logAdminInitFailedError(
     userEmail,
     false,
     `Error during initialization: ${errorMessage}`
+  );
+}
+
+/**
+ * Log user approval
+ */
+export async function logUserApproved(
+  targetUserId: string,
+  targetUserEmail: string,
+  adminUserId: string,
+  adminEmail: string
+): Promise<void> {
+  await logAuditEvent(
+    AuditEventType.USER_APPROVED,
+    adminUserId,
+    adminEmail,
+    true,
+    `User ${targetUserEmail} (${targetUserId}) approved by admin`
+  );
+}
+
+/**
+ * Log user approval revocation
+ */
+export async function logUserApprovalRevoked(
+  targetUserId: string,
+  targetUserEmail: string,
+  adminUserId: string,
+  adminEmail: string
+): Promise<void> {
+  await logAuditEvent(
+    AuditEventType.USER_APPROVAL_REVOKED,
+    adminUserId,
+    adminEmail,
+    true,
+    `User ${targetUserEmail} (${targetUserId}) approval revoked by admin`
   );
 }
