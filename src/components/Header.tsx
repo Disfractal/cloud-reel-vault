@@ -1,4 +1,4 @@
-import { Cloud, Search, LogOut, User, Users } from "lucide-react";
+import { Cloud, Search, LogOut, User, Users, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,7 +23,7 @@ export const Header = ({
   searchQuery,
   onSearchChange
 }: HeaderProps) => {
-  const { user, userProfile, logout } = useAuth();
+  const { user, userProfile, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -77,6 +77,15 @@ export const Header = ({
                   <span className="hidden sm:inline">Users</span>
                 </Button>
               </Link>
+              
+              {isAdmin && (
+                <Link to="/audit-logs">
+                  <Button variant="outline" className="gap-2">
+                    <FileText className="h-4 w-4" />
+                    <span className="hidden sm:inline">Audit Logs</span>
+                  </Button>
+                </Link>
+              )}
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
