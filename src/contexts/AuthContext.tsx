@@ -9,6 +9,7 @@ import {
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { collections } from "@/lib/firestore-helpers";
+import { getUserRoles, UserRole } from "@/lib/roles";
 
 interface UserProfile {
   id: string;
@@ -25,10 +26,13 @@ interface UserProfile {
 interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
+  userRoles: UserRole[];
+  isAdmin: boolean;
   loading: boolean;
   signUp: (email: string, password: string, username?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshRoles: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,7 +48,19 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const loadUserRoles = async (userId: string) => {
+    const roles = await getUserRoles(userId);
+    setUserRoles(roles);
+  };
+
+  const refreshRoles = async () => {
+    if (user) {
+      await loadUserRoles(user.uid);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -56,8 +72,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (profileDoc.exists()) {
           setUserProfile(profileDoc.data() as UserProfile);
         }
+        
+        // Load user roles
+        await loadUserRoles(user.uid);
       } else {
         setUserProfile(null);
+        setUserRoles([]);
       }
       
       setLoading(false);
@@ -96,10 +116,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     user,
     userProfile,
+    userRoles,
+    isAdmin: userRoles.includes(UserRole.ADMIN),
     loading,
     signUp,
     signIn,
     logout,
+    refreshRoles,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

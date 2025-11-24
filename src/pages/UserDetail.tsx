@@ -4,11 +4,14 @@ import { Header } from "@/components/Header";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { collections } from "@/lib/firestore-helpers";
+import { useAuth } from "@/contexts/AuthContext";
+import { getUserRoles, addUserRole, removeUserRole, UserRole } from "@/lib/roles";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft, Mail, User, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Mail, User, Calendar, CheckCircle, XCircle, Shield } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -25,9 +28,12 @@ interface UserProfile {
 const UserDetail = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const { isAdmin, refreshRoles } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingRole, setUpdatingRole] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -58,6 +64,10 @@ const UserDetail = () => {
         } as UserProfile;
 
         setUser(userData);
+        
+        // Fetch user roles
+        const userRoles = await getUserRoles(userId);
+        setRoles(userRoles);
       } catch (error) {
         console.error("Error fetching user:", error);
         toast({
@@ -72,6 +82,43 @@ const UserDetail = () => {
 
     fetchUser();
   }, [userId, navigate, toast]);
+
+  const handleToggleAdminRole = async () => {
+    if (!userId || !user) return;
+
+    setUpdatingRole(true);
+    try {
+      const isCurrentlyAdmin = roles.includes(UserRole.ADMIN);
+      
+      if (isCurrentlyAdmin) {
+        await removeUserRole(userId, UserRole.ADMIN);
+        setRoles(roles.filter(r => r !== UserRole.ADMIN));
+        toast({
+          title: "Admin role removed",
+          description: `${user.username || user.email} is no longer an admin.`,
+        });
+      } else {
+        await addUserRole(userId, UserRole.ADMIN);
+        setRoles([...roles, UserRole.ADMIN]);
+        toast({
+          title: "Admin role granted",
+          description: `${user.username || user.email} is now an admin.`,
+        });
+      }
+      
+      // Refresh roles in auth context
+      await refreshRoles();
+    } catch (error) {
+      console.error("Error updating role:", error);
+      toast({
+        title: "Error updating role",
+        description: "Could not update user role. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingRole(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -106,22 +153,48 @@ const UserDetail = () => {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarFallback className="text-2xl">
-                  {user.username?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle className="text-3xl">
-                  {user.firstName && user.lastName
-                    ? `${user.firstName} ${user.lastName}`
-                    : user.username || 'Unknown User'}
-                </CardTitle>
-                <p className="text-muted-foreground mt-1">
-                  User ID: {user.id}
-                </p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarFallback className="text-2xl">
+                    {user.username?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-3xl">
+                      {user.firstName && user.lastName
+                        ? `${user.firstName} ${user.lastName}`
+                        : user.username || 'Unknown User'}
+                    </CardTitle>
+                    {roles.includes(UserRole.ADMIN) && (
+                      <Badge variant="default" className="gap-1">
+                        <Shield className="h-3 w-3" />
+                        Admin
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground mt-1">
+                    User ID: {user.id}
+                  </p>
+                </div>
               </div>
+              
+              {isAdmin && (
+                <Button
+                  variant={roles.includes(UserRole.ADMIN) ? "destructive" : "default"}
+                  onClick={handleToggleAdminRole}
+                  disabled={updatingRole}
+                  className="gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  {updatingRole
+                    ? "Updating..."
+                    : roles.includes(UserRole.ADMIN)
+                    ? "Remove Admin"
+                    : "Make Admin"}
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
