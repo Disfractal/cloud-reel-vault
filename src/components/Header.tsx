@@ -1,4 +1,4 @@
-import { Cloud, Search, Upload, LogOut, User } from "lucide-react";
+import { Cloud, Search, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,13 +15,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
 interface HeaderProps {
-  onUploadClick: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
 }
 
 export const Header = ({
-  onUploadClick,
   searchQuery,
   onSearchChange
 }: HeaderProps) => {
@@ -73,11 +71,6 @@ export const Header = ({
           
           {user ? (
             <>
-              <Button onClick={onUploadClick} className="gap-2">
-                <Upload className="h-4 w-4" />
-                <span className="hidden sm:inline">Upload</span>
-              </Button>
-              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
