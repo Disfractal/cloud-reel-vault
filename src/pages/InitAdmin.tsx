@@ -4,6 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { addUserRole, UserRole } from "@/lib/roles";
+import {
+  logAdminInitSuccess,
+  logAdminInitFailedInvalidCode,
+  logAdminInitFailedAlreadyExists,
+  logAdminInitFailedNotAuthenticated,
+  logAdminInitFailedError,
+} from "@/lib/security-audit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,6 +63,7 @@ const InitAdmin = () => {
     e.preventDefault();
     
     if (!user) {
+      await logAdminInitFailedNotAuthenticated();
       toast({
         title: "Not authenticated",
         description: "You must be signed in to initialize admin.",
@@ -72,6 +80,7 @@ const InitAdmin = () => {
 
       // Check secret code
       if (validated.secretCode !== ADMIN_SETUP_SECRET) {
+        await logAdminInitFailedInvalidCode(user.uid, user.email || undefined);
         toast({
           title: "Invalid secret code",
           description: "The secret code you entered is incorrect.",
@@ -91,6 +100,7 @@ const InitAdmin = () => {
       );
 
       if (hasAdmin) {
+        await logAdminInitFailedAlreadyExists(user.uid, user.email || undefined);
         toast({
           title: "Admin already exists",
           description: "An admin has already been initialized.",
@@ -103,6 +113,9 @@ const InitAdmin = () => {
 
       // Add admin role to current user
       await addUserRole(user.uid, UserRole.ADMIN);
+      
+      // Log successful initialization
+      await logAdminInitSuccess(user.uid, user.email || "unknown");
 
       toast({
         title: "Admin initialized!",
@@ -121,6 +134,11 @@ const InitAdmin = () => {
           variant: "destructive",
         });
       } else {
+        await logAdminInitFailedError(
+          user?.uid,
+          user?.email || undefined,
+          error.message || "Unknown error"
+        );
         console.error("Error initializing admin:", error);
         toast({
           title: "Initialization failed",
