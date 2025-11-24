@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, userProfile, isAdmin, loading } = useAuth();
+  const { user, userProfile, isAdmin, loading, logout } = useAuth();
   const [resending, setResending] = useState(false);
   const { toast } = useToast();
 
@@ -95,6 +95,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           <p className="text-sm text-muted-foreground">
             You will be able to access the full application once your account has been approved.
           </p>
+          <div className="pt-4">
+            <Button 
+              onClick={logout} 
+              variant="outline"
+              className="w-full"
+            >
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
     );
