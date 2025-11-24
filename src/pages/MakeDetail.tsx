@@ -2,15 +2,19 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { getDocument } from "@/lib/firestore-helpers";
-import { collections } from "@/lib/firestore-helpers";
-import type { AutoMake } from "@/types/firestore";
+import { getDocument, queryDocuments, collections } from "@/lib/firestore-helpers";
+import { where } from "firebase/firestore";
+import type { AutoMake, AutoModel } from "@/types/firestore";
 
 const MakeDetail = () => {
   const { makeId } = useParams<{ makeId: string }>();
   const [make, setMake] = useState<AutoMake | null>(null);
+  const [models, setModels] = useState<AutoModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modelsLoading, setModelsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,6 +46,31 @@ const MakeDetail = () => {
 
     fetchMake();
   }, [makeId, toast]);
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      if (!make) return;
+      
+      try {
+        const modelsData = await queryDocuments<AutoModel>(
+          collections.autoModels,
+          [where("makeName", "==", make.name.toLowerCase())]
+        );
+        setModels(modelsData);
+      } catch (error) {
+        console.error("Error fetching models:", error);
+        toast({
+          title: "Error",
+          description: "Could not load models.",
+          variant: "destructive"
+        });
+      } finally {
+        setModelsLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, [make, toast]);
 
   if (loading) {
     return (
@@ -79,7 +108,7 @@ const MakeDetail = () => {
           </Button>
         </Link>
 
-        <div className="max-w-4xl">
+        <div className="max-w-6xl">
           <div className="flex items-center gap-6 mb-8">
             {make.logoImage ? (
               <img 
@@ -102,6 +131,36 @@ const MakeDetail = () => {
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold mb-6">Models</h2>
+            {modelsLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-32" />
+                ))}
+              </div>
+            ) : models.length === 0 ? (
+              <p className="text-muted-foreground">No models found for this make.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {models.map((model) => (
+                  <Card key={model.id}>
+                    <CardHeader>
+                      <CardTitle className="capitalize">{model.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {(model.productionStartYear || model.productionEndYear) && (
+                        <p className="text-sm text-muted-foreground">
+                          {model.productionStartYear || '?'} - {model.productionEndYear || 'Present'}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
