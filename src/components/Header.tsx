@@ -1,4 +1,4 @@
-import { Cloud, Search, LogOut, User } from "lucide-react";
+import { Cloud, Search, LogOut, User, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -71,6 +71,13 @@ export const Header = ({
           
           {user ? (
             <>
+              <Link to="/users">
+                <Button variant="outline" className="gap-2">
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">Users</span>
+                </Button>
+              </Link>
+              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
