@@ -63,10 +63,17 @@ const Auth = () => {
       
       toast({
         title: "Account created!",
-        description: "Welcome to AutoSpotr",
+        description: "Please check your email to verify your account before signing in.",
       });
       
-      navigate("/");
+      // Don't navigate automatically - user needs to verify email first
+      // Clear the form
+      setSignUpForm({
+        email: "",
+        password: "",
+        confirmPassword: "",
+        username: "",
+      });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast({

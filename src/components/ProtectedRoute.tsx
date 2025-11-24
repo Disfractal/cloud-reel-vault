@@ -6,7 +6,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, userProfile, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -20,17 +20,20 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check if user is approved
-  if (userProfile && !userProfile.approved) {
+  // Check if user has verified their email
+  if (!user.emailVerified) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="max-w-md p-8 text-center space-y-4">
-          <h2 className="text-2xl font-bold">Pending Approval</h2>
+          <h2 className="text-2xl font-bold">Email Verification Required</h2>
           <p className="text-muted-foreground">
-            Your account is awaiting approval from an administrator. You will receive access once your account has been reviewed and approved.
+            Please verify your email address to access the application. We've sent a verification link to:
+          </p>
+          <p className="font-medium">
+            {user.email}
           </p>
           <p className="text-sm text-muted-foreground">
-            Email: {userProfile.email}
+            Check your inbox and click the verification link. Once verified, refresh this page to continue.
           </p>
         </div>
       </div>

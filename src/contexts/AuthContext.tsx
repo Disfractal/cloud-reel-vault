@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendEmailVerification,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -19,7 +20,6 @@ interface UserProfile {
   username?: string;
   picture?: string;
   emailVerified: boolean;
-  approved: boolean;
   createdOn: Date;
   updatedOn: Date;
 }
@@ -91,12 +91,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // Send email verification
+    await sendEmailVerification(user);
+
     // Create user profile in Firestore
     const userProfile: Omit<UserProfile, "id"> = {
       email: user.email!,
       username: username || email.split("@")[0],
       emailVerified: user.emailVerified,
-      approved: false, // New users require admin approval
       createdOn: new Date(),
       updatedOn: new Date(),
     };

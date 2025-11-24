@@ -17,7 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Shield, UserCheck, UserX } from "lucide-react";
+import { Shield } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -26,7 +26,6 @@ interface UserProfile {
   firstName?: string;
   lastName?: string;
   emailVerified: boolean;
-  approved: boolean;
   createdOn: Date;
   roles?: UserRole[];
 }
@@ -114,7 +113,6 @@ const Users = () => {
                       <TableHead>Email</TableHead>
                       <TableHead>Username</TableHead>
                       <TableHead>Role</TableHead>
-                      <TableHead>Status</TableHead>
                       <TableHead>Email Verified</TableHead>
                       <TableHead>Joined</TableHead>
                     </TableRow>
@@ -152,19 +150,6 @@ const Users = () => {
                             </Badge>
                           ) : (
                             <span className="text-muted-foreground">User</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {user.approved ? (
-                            <Badge variant="outline" className="gap-1 text-green-600 border-green-600">
-                              <UserCheck className="h-3 w-3" />
-                              Approved
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="gap-1">
-                              <UserX className="h-3 w-3" />
-                              Pending
-                            </Badge>
                           )}
                         </TableCell>
                         <TableCell>
