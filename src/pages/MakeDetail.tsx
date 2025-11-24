@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { getDocument, queryDocuments, collections } from "@/lib/firestore-helpers";
 import { where } from "firebase/firestore";
 import type { AutoMake, AutoModel } from "@/types/firestore";
+import { HeroImageUpload } from "@/components/HeroImageUpload";
 
 const MakeDetail = () => {
   const { makeId } = useParams<{ makeId: string }>();
@@ -16,6 +18,7 @@ const MakeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [modelsLoading, setModelsLoading] = useState(true);
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchMake = async () => {
@@ -110,6 +113,16 @@ const MakeDetail = () => {
         </Link>
 
         <div className="max-w-6xl">
+          {make.heroImage && (
+            <div className="mb-8 rounded-lg overflow-hidden">
+              <img 
+                src={make.heroImage} 
+                alt={`${make.name} hero`}
+                className="w-full h-64 object-cover"
+              />
+            </div>
+          )}
+
           <div className="flex items-center gap-6 mb-8">
             {make.logoImage ? (
               <img 
@@ -124,7 +137,7 @@ const MakeDetail = () => {
                 </span>
               </div>
             )}
-            <div>
+            <div className="flex-1">
               <h1 className="text-4xl font-bold capitalize mb-2">{make.name}</h1>
               {make.foundedYear && (
                 <p className="text-lg text-muted-foreground">
@@ -132,6 +145,14 @@ const MakeDetail = () => {
                 </p>
               )}
             </div>
+            {isAdmin && (
+              <HeroImageUpload 
+                makeId={make.id}
+                makeName={make.name}
+                currentHeroImage={make.heroImage}
+                onUploadComplete={(url) => setMake({ ...make, heroImage: url })}
+              />
+            )}
           </div>
 
           <div className="mt-12">
