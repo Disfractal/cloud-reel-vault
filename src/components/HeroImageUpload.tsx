@@ -2,9 +2,8 @@ import { useState } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import app from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
 import { collections } from "@/lib/firestore-helpers";
 
@@ -51,9 +50,8 @@ export function HeroImageUpload({
     setUploading(true);
 
     try {
-      // Upload to Firebase Storage (custom bucket)
-      const customStorage = getStorage(app, "gs://dev-autospotr-images");
-      const storageRef = ref(customStorage, `make-heroes/${makeId}-${Date.now()}`);
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, `make-heroes/${makeId}-${Date.now()}`);
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
 
