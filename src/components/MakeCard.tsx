@@ -26,7 +26,9 @@ export function MakeCard({ make }: MakeCardProps) {
               </div>
             )}
             <div className="flex-1">
-              <h3 className="text-lg font-semibold capitalize">{make.name}</h3>
+              <h3 className={`text-lg font-semibold ${make.uppercase ? 'uppercase' : 'capitalize'}`}>
+                {make.name}
+              </h3>
               {make.foundedYear && (
                 <p className="text-sm text-muted-foreground">
                   Founded: {make.foundedYear}
