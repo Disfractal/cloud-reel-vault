@@ -118,7 +118,7 @@ const MakeDetail = () => {
               <img 
                 src={make.heroImage} 
                 alt={`${make.name} hero`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           )}
