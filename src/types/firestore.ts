@@ -20,6 +20,7 @@ export interface AutoMake {
   logoImage?: string;
   heroImage?: string;
   foundedYear?: number;
+  uppercase?: boolean;
   updatedOn: Timestamp;
   createdOn: Timestamp;
 }

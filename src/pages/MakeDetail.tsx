@@ -4,9 +4,11 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDocument, queryDocuments, collections } from "@/lib/firestore-helpers";
+import { getDocument, queryDocuments, collections, updateDocument } from "@/lib/firestore-helpers";
 import { where } from "firebase/firestore";
 import type { AutoMake, AutoModel } from "@/types/firestore";
 import { HeroImageUpload } from "@/components/HeroImageUpload";
@@ -75,6 +77,28 @@ const MakeDetail = () => {
 
     fetchModels();
   }, [make, toast]);
+
+  const handleUppercaseToggle = async (checked: boolean) => {
+    if (!make || !isAdmin) return;
+    
+    try {
+      await updateDocument<AutoMake>(collections.autoMakes, make.id, {
+        uppercase: checked
+      });
+      setMake({ ...make, uppercase: checked });
+      toast({
+        title: "Updated",
+        description: "Uppercase setting saved successfully."
+      });
+    } catch (error) {
+      console.error("Error updating uppercase setting:", error);
+      toast({
+        title: "Error",
+        description: "Could not update uppercase setting.",
+        variant: "destructive"
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -146,12 +170,22 @@ const MakeDetail = () => {
               )}
             </div>
             {isAdmin && (
-              <HeroImageUpload 
-                makeId={make.id}
-                makeName={make.name}
-                currentHeroImage={make.heroImage}
-                onUploadComplete={(url) => setMake({ ...make, heroImage: url })}
-              />
+              <div className="flex flex-col gap-4">
+                <HeroImageUpload 
+                  makeId={make.id}
+                  makeName={make.name}
+                  currentHeroImage={make.heroImage}
+                  onUploadComplete={(url) => setMake({ ...make, heroImage: url })}
+                />
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="uppercase-mode"
+                    checked={make.uppercase || false}
+                    onCheckedChange={handleUppercaseToggle}
+                  />
+                  <Label htmlFor="uppercase-mode">Uppercase</Label>
+                </div>
+              </div>
             )}
           </div>
 
