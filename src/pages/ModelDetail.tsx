@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getDocument, collections } from "@/lib/firestore-helpers";
 import type { AutoModel } from "@/types/firestore";
+import VideoUpload from "@/components/VideoUpload";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ModelDetail = () => {
   const { modelId } = useParams<{ modelId: string }>();
   const [model, setModel] = useState<AutoModel | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchModel = async () => {
@@ -80,13 +83,31 @@ const ModelDetail = () => {
 
         <div className="max-w-6xl">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold capitalize mb-2">{model.name}</h1>
-            <p className="text-xl text-muted-foreground capitalize">{model.makeName}</p>
-            {(model.productionStartYear || model.productionEndYear) && (
-              <p className="text-lg text-muted-foreground mt-2">
-                Production: {model.productionStartYear || '?'} - {model.productionEndYear || 'Present'}
-              </p>
-            )}
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h1 className="text-4xl font-bold capitalize mb-2">{model.name}</h1>
+                <p className="text-xl text-muted-foreground capitalize">{model.makeName}</p>
+                {(model.productionStartYear || model.productionEndYear) && (
+                  <p className="text-lg text-muted-foreground mt-2">
+                    Production: {model.productionStartYear || '?'} - {model.productionEndYear || 'Present'}
+                  </p>
+                )}
+              </div>
+              {isAdmin && (
+                <VideoUpload
+                  modelId={model.id}
+                  modelName={model.name}
+                  currentVideoUrl={(model as any).videoUrl}
+                  onUploadComplete={() => {
+                    if (modelId) {
+                      getDocument<AutoModel>(collections.autoModels, modelId).then(updated => {
+                        if (updated) setModel(updated);
+                      });
+                    }
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
