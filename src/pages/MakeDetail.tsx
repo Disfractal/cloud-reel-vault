@@ -162,7 +162,9 @@ const MakeDetail = () => {
               </div>
             )}
             <div className="flex-1">
-              <h1 className="text-4xl font-bold capitalize mb-2">{make.name}</h1>
+              <h1 className={`text-4xl font-bold mb-2 ${make.uppercase ? 'uppercase' : 'capitalize'}`}>
+                {make.name}
+              </h1>
               {make.foundedYear && (
                 <p className="text-lg text-muted-foreground">
                   Founded: {make.foundedYear}
