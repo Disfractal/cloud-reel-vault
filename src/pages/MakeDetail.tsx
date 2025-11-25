@@ -114,7 +114,7 @@ const MakeDetail = () => {
 
         <div className="max-w-6xl">
           {make.heroImage && (
-            <div className="mb-8 rounded-lg overflow-hidden aspect-[21/9]">
+            <div className="mb-8 rounded-lg overflow-hidden aspect-[42/9]">
               <img 
                 src={make.heroImage} 
                 alt={`${make.name} hero`}
