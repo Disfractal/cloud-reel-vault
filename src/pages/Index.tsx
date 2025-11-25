@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
+import { Plus } from "lucide-react";
 import { Header } from "@/components/Header";
 import { MakeCard } from "@/components/MakeCard";
 import { DataImporter } from "@/components/DataImporter";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { getAllMakes } from "@/lib/firestore-helpers";
+import { useAuth } from "@/contexts/AuthContext";
+import { getAllMakes, createDocument, collections } from "@/lib/firestore-helpers";
 import type { AutoMake } from "@/types/firestore";
 import videoThumb1 from "@/assets/video-thumb-1.jpg";
 import videoThumb2 from "@/assets/video-thumb-2.jpg";
@@ -59,9 +65,12 @@ const Index = () => {
   const [makes, setMakes] = useState<AutoMake[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImporter, setShowImporter] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newMakeName, setNewMakeName] = useState("");
+  const [newMakeYear, setNewMakeYear] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
+  const { isAdmin } = useAuth();
   useEffect(() => {
     const fetchMakes = async () => {
       try {
@@ -89,6 +98,51 @@ const Index = () => {
     };
     fetchMakes();
   }, [toast]);
+
+  const handleAddMake = async () => {
+    if (!newMakeName.trim()) {
+      toast({
+        title: "Error",
+        description: "Make name is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const makeData: Omit<AutoMake, "id" | "createdOn" | "updatedOn"> = {
+        name: newMakeName.toLowerCase().trim(),
+        foundedYear: newMakeYear ? parseInt(newMakeYear) : undefined,
+        uppercase: false
+      };
+
+      const newId = await createDocument<AutoMake>(collections.autoMakes, makeData);
+      
+      // Refresh the makes list
+      const updatedMakes = await getAllMakes();
+      setMakes(updatedMakes);
+      
+      toast({
+        title: "Success",
+        description: "Make added successfully."
+      });
+      
+      setDialogOpen(false);
+      setNewMakeName("");
+      setNewMakeYear("");
+    } catch (error) {
+      console.error("Error adding make:", error);
+      toast({
+        title: "Error",
+        description: "Could not add make.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const filteredMakes = makes.filter(make => make.name.toLowerCase().includes(searchQuery.toLowerCase()));
   return <div className="min-h-screen bg-background">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
@@ -98,11 +152,64 @@ const Index = () => {
             <DataImporter />
           </div>}
         
-        {!showImporter && <div className="mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Car Makes</h2>
-            <p className="text-muted-foreground">
-              {filteredMakes.length} Makes
-            </p>
+        {!showImporter && <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Car Makes</h2>
+              <p className="text-muted-foreground">
+                {filteredMakes.length} Makes
+              </p>
+            </div>
+            {isAdmin && (
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Make
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Make</DialogTitle>
+                    <DialogDescription>
+                      Create a new car make in the database.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="make-name">Make Name *</Label>
+                      <Input
+                        id="make-name"
+                        value={newMakeName}
+                        onChange={(e) => setNewMakeName(e.target.value)}
+                        placeholder="e.g., Toyota"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="founded-year">Founded Year</Label>
+                      <Input
+                        id="founded-year"
+                        type="number"
+                        value={newMakeYear}
+                        onChange={(e) => setNewMakeYear(e.target.value)}
+                        placeholder="e.g., 1937"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                      disabled={submitting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddMake} disabled={submitting}>
+                      {submitting ? "Adding..." : "Add Make"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>}
 
         {loading ? <div className="flex min-h-[400px] items-center justify-center">
