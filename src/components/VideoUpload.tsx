@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { updateDocument, collections } from "@/lib/firestore-helpers";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,6 +21,7 @@ const VideoUpload = ({
   onUploadComplete 
 }: VideoUploadProps) => {
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const { toast } = useToast();
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,27 +49,51 @@ const VideoUpload = ({
     }
 
     setUploading(true);
+    setUploadProgress(0);
 
     try {
-      // Upload to Firebase Storage
+      // Upload to Firebase Storage with progress tracking
       const timestamp = Date.now();
       const fileName = `${modelId}_${timestamp}.${file.name.split('.').pop()}`;
-      const storageRef = ref(storage, `gs://dev-autospotr-videos/model-videos/${fileName}`);
+      const storageRef = ref(storage, `model-videos/${fileName}`);
       
-      await uploadBytes(storageRef, file);
-      const downloadUrl = await getDownloadURL(storageRef);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-      // Update model document with video URL
-      await updateDocument(collections.autoModels, modelId, {
-        videoUrl: downloadUrl
-      });
+      // Track upload progress
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.round(progress));
+        },
+        (error) => {
+          console.error("Error uploading video:", error);
+          toast({
+            title: "Upload failed",
+            description: "Could not upload video. Please try again.",
+            variant: "destructive"
+          });
+          setUploading(false);
+          setUploadProgress(0);
+        },
+        async () => {
+          // Upload complete
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
-      toast({
-        title: "Success",
-        description: `Video uploaded for ${modelName}`,
-      });
+          // Update model document with video URL
+          await updateDocument(collections.autoModels, modelId, {
+            videoUrl: downloadUrl
+          });
 
-      onUploadComplete?.(downloadUrl);
+          toast({
+            title: "Success",
+            description: `Video uploaded for ${modelName}`,
+          });
+
+          onUploadComplete?.(downloadUrl);
+          setUploading(false);
+          setUploadProgress(0);
+        }
+      );
     } catch (error) {
       console.error("Error uploading video:", error);
       toast({
@@ -75,13 +101,13 @@ const VideoUpload = ({
         description: "Could not upload video. Please try again.",
         variant: "destructive"
       });
-    } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
   return (
-    <>
+    <div className="space-y-2">
       <input
         type="file"
         accept="video/*"
@@ -95,9 +121,14 @@ const VideoUpload = ({
         variant="outline"
       >
         <Upload className="mr-2 h-4 w-4" />
-        {uploading ? 'Uploading...' : currentVideoUrl ? 'Change Video' : 'Upload Video'}
+        {uploading ? `Uploading... ${uploadProgress}%` : currentVideoUrl ? 'Change Video' : 'Upload Video'}
       </Button>
-    </>
+      {uploading && (
+        <div className="w-full">
+          <Progress value={uploadProgress} className="h-2" />
+        </div>
+      )}
+    </div>
   );
 };
 
