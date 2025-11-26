@@ -18,7 +18,9 @@ export interface AutoMake {
   id: string;
   name: string;
   logoImage?: string;
+  heroImage?: string;
   foundedYear?: number;
+  uppercase?: boolean;
   updatedOn: Timestamp;
   createdOn: Timestamp;
 }
@@ -30,6 +32,7 @@ export interface AutoModel {
   makeName: string;
   productionStartYear?: number;
   productionEndYear?: number;
+  uppercase?: boolean;
   updatedOn: Timestamp;
   createdOn: Timestamp;
 }
