@@ -207,7 +207,7 @@ const MakeDetail = () => {
                   <Link key={model.id} to={`/model/${model.id}`}>
                     <Card className="hover:bg-accent transition-colors cursor-pointer">
                       <CardHeader>
-                        <CardTitle className="capitalize">{model.name}</CardTitle>
+                        <CardTitle className={model.uppercase ? 'uppercase' : 'capitalize'}>{model.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         {(model.productionStartYear || model.productionEndYear) && (
