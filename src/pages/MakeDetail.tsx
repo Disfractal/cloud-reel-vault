@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDocument, queryDocuments, collections, updateDocument } from "@/lib/firestore-helpers";
+import { getDocument, queryDocuments, collections, updateDocument, createDocument } from "@/lib/firestore-helpers";
 import { where } from "firebase/firestore";
 import type { AutoMake, AutoModel } from "@/types/firestore";
 import { HeroImageUpload } from "@/components/HeroImageUpload";
@@ -19,6 +21,11 @@ const MakeDetail = () => {
   const [models, setModels] = useState<AutoModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [modelsLoading, setModelsLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newModelName, setNewModelName] = useState("");
+  const [productionStartYear, setProductionStartYear] = useState("");
+  const [productionEndYear, setProductionEndYear] = useState("");
   const { toast } = useToast();
   const { isAdmin } = useAuth();
 
@@ -97,6 +104,56 @@ const MakeDetail = () => {
         description: "Could not update uppercase setting.",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleCreateModel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!make || !newModelName.trim()) return;
+    
+    setCreating(true);
+    try {
+      const modelData = {
+        name: newModelName.trim().toLowerCase(),
+        makeId: make.id,
+        makeName: make.name.toLowerCase(),
+        ...(productionStartYear && { productionStartYear: parseInt(productionStartYear) }),
+        ...(productionEndYear && { productionEndYear: parseInt(productionEndYear) }),
+        uppercase: false
+      };
+
+      await createDocument<Omit<AutoModel, "id" | "createdOn" | "updatedOn">>(
+        collections.autoModels,
+        modelData
+      );
+
+      toast({
+        title: "Success",
+        description: "Model created successfully."
+      });
+
+      // Reset form and close dialog
+      setNewModelName("");
+      setProductionStartYear("");
+      setProductionEndYear("");
+      setDialogOpen(false);
+
+      // Refresh models list
+      const modelsData = await queryDocuments<AutoModel>(
+        collections.autoModels,
+        [where("makeName", "==", make.name.toLowerCase())]
+      );
+      const sortedModels = modelsData.sort((a, b) => a.name.localeCompare(b.name));
+      setModels(sortedModels);
+    } catch (error) {
+      console.error("Error creating model:", error);
+      toast({
+        title: "Error",
+        description: "Could not create model.",
+        variant: "destructive"
+      });
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -192,7 +249,74 @@ const MakeDetail = () => {
           </div>
 
           <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-6">Models</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Models</h2>
+              {isAdmin && (
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Model
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Model</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateModel} className="space-y-4">
+                      <div>
+                        <Label htmlFor="modelName">Model Name *</Label>
+                        <Input
+                          id="modelName"
+                          value={newModelName}
+                          onChange={(e) => setNewModelName(e.target.value)}
+                          placeholder="e.g., Civic"
+                          required
+                          maxLength={100}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="startYear">Production Start Year</Label>
+                        <Input
+                          id="startYear"
+                          type="number"
+                          value={productionStartYear}
+                          onChange={(e) => setProductionStartYear(e.target.value)}
+                          placeholder="e.g., 2020"
+                          min="1800"
+                          max="2100"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="endYear">Production End Year</Label>
+                        <Input
+                          id="endYear"
+                          type="number"
+                          value={productionEndYear}
+                          onChange={(e) => setProductionEndYear(e.target.value)}
+                          placeholder="Leave empty if still in production"
+                          min="1800"
+                          max="2100"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setDialogOpen(false)}
+                          disabled={creating}
+                        >
+                          Cancel
+                        </Button>
+                        <Button type="submit" disabled={creating || !newModelName.trim()}>
+                          {creating ? "Creating..." : "Create Model"}
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
             {modelsLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1, 2, 3].map((i) => (
