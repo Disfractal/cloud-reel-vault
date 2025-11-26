@@ -3,15 +3,18 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { getDocument, collections } from "@/lib/firestore-helpers";
+import { getDocument, collections, updateDocument } from "@/lib/firestore-helpers";
 import type { AutoModel } from "@/types/firestore";
 import VideoUpload from "@/components/VideoUpload";
 import { useAuth } from "@/contexts/AuthContext";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const ModelDetail = () => {
   const { modelId } = useParams<{ modelId: string }>();
   const [model, setModel] = useState<AutoModel | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updatingUppercase, setUpdatingUppercase] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAuth();
 
@@ -44,6 +47,31 @@ const ModelDetail = () => {
 
     fetchModel();
   }, [modelId, toast]);
+
+  const handleUppercaseToggle = async (checked: boolean) => {
+    if (!modelId || !model) return;
+    
+    setUpdatingUppercase(true);
+    try {
+      await updateDocument<AutoModel>(collections.autoModels, modelId, {
+        uppercase: checked
+      });
+      setModel({ ...model, uppercase: checked });
+      toast({
+        title: "Updated",
+        description: `Model name will ${checked ? 'be displayed in uppercase' : 'use normal case'}.`
+      });
+    } catch (error) {
+      console.error("Error updating uppercase setting:", error);
+      toast({
+        title: "Error",
+        description: "Could not update uppercase setting.",
+        variant: "destructive"
+      });
+    } finally {
+      setUpdatingUppercase(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -85,7 +113,9 @@ const ModelDetail = () => {
           <div className="mb-8">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h1 className="text-4xl font-bold capitalize mb-2">{model.name}</h1>
+                <h1 className={`text-4xl font-bold mb-2 ${model.uppercase ? 'uppercase' : 'capitalize'}`}>
+                  {model.name}
+                </h1>
                 <p className="text-xl text-muted-foreground capitalize">{model.makeName}</p>
                 {(model.productionStartYear || model.productionEndYear) && (
                   <p className="text-lg text-muted-foreground mt-2">
@@ -94,18 +124,31 @@ const ModelDetail = () => {
                 )}
               </div>
               {isAdmin && (
-                <VideoUpload
-                  modelId={model.id}
-                  modelName={model.name}
-                  currentVideoUrl={(model as any).videoUrl}
-                  onUploadComplete={() => {
-                    if (modelId) {
-                      getDocument<AutoModel>(collections.autoModels, modelId).then(updated => {
-                        if (updated) setModel(updated);
-                      });
-                    }
-                  }}
-                />
+                <div className="flex flex-col gap-4">
+                  <VideoUpload
+                    modelId={model.id}
+                    modelName={model.name}
+                    currentVideoUrl={(model as any).videoUrl}
+                    onUploadComplete={() => {
+                      if (modelId) {
+                        getDocument<AutoModel>(collections.autoModels, modelId).then(updated => {
+                          if (updated) setModel(updated);
+                        });
+                      }
+                    }}
+                  />
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="uppercase-toggle"
+                      checked={model.uppercase || false}
+                      onCheckedChange={handleUppercaseToggle}
+                      disabled={updatingUppercase}
+                    />
+                    <Label htmlFor="uppercase-toggle" className="cursor-pointer">
+                      Uppercase
+                    </Label>
+                  </div>
+                </div>
               )}
             </div>
           </div>

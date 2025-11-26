@@ -32,6 +32,7 @@ export interface AutoModel {
   makeName: string;
   productionStartYear?: number;
   productionEndYear?: number;
+  uppercase?: boolean;
   updatedOn: Timestamp;
   createdOn: Timestamp;
 }
