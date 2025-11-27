@@ -9,6 +9,7 @@ import VideoUpload from "@/components/VideoUpload";
 import { useAuth } from "@/contexts/AuthContext";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import VideoPlayer from "@/components/VideoPlayer";
 
 const ModelDetail = () => {
   const { modelId } = useParams<{ modelId: string }>();
@@ -152,6 +153,13 @@ const ModelDetail = () => {
               )}
             </div>
           </div>
+
+          {model.encodingState === 'complete' && (
+            <VideoPlayer
+              videoUrl={`https://storage.googleapis.com/dev-autospotr-videos/model-videos-rendered/${model.id}/manifest.m3u8`}
+              modelName={model.name}
+            />
+          )}
         </div>
       </div>
     </div>
