@@ -61,8 +61,8 @@ const Admin = () => {
             const Icon = section.icon;
             return (
               <Link key={section.href} to={section.href}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                  <CardHeader>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer h-48">
+                  <CardHeader className="h-full flex flex-col justify-center">
                     <div className="flex items-center gap-4">
                       <div className={`p-3 rounded-lg bg-card ${section.color}`}>
                         <Icon className="h-6 w-6" />
