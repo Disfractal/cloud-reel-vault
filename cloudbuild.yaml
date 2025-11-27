@@ -4,11 +4,7 @@ steps:
   args: ['-c', 'ls -la && pwd']
 
 - name: 'gcr.io/cloud-builders/npm'
-  entrypoint: 'bash'
-  args: ['-c', 'rm -rf node_modules package-lock.json || true && npm install']
-
-- name: 'gcr.io/cloud-builders/npm'
-  args: ['install', '@rollup/rollup-linux-x64-gnu', '--save-optional']
+  args: ['install']
 
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build'] 

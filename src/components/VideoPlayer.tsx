@@ -23,7 +23,7 @@ const VideoPlayer = ({ videoUrl, modelName }: VideoPlayerProps) => {
       preload: "auto",
       sources: [{
         src: videoUrl,
-        type: "application/vnd.apple.mpegurl"
+        type: "application/x-mpegURL"
       }],
       html5: {
         vhs: {
