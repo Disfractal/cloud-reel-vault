@@ -47,6 +47,14 @@ const ModelDetail = () => {
     };
 
     fetchModel();
+    
+    // Set up polling every 5 seconds
+    const intervalId = setInterval(() => {
+      fetchModel();
+    }, 5000);
+    
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
   }, [modelId, toast]);
 
   const handleUppercaseToggle = async (checked: boolean) => {
