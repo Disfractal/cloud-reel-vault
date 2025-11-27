@@ -22,6 +22,13 @@ const Admin = () => {
 
   const adminSections = [
     {
+      title: "Browse Makes",
+      description: "View and manage car makes and models",
+      icon: Database,
+      href: "/makes",
+      color: "text-purple-500"
+    },
+    {
       title: "Users",
       description: "Manage user accounts and permissions",
       icon: Users,
@@ -34,13 +41,6 @@ const Admin = () => {
       icon: FileText,
       href: "/audit-logs",
       color: "text-green-500"
-    },
-    {
-      title: "Browse Makes",
-      description: "View and manage car makes and models",
-      icon: Database,
-      href: "/makes",
-      color: "text-purple-500"
     }
   ];
 
