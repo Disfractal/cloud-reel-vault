@@ -57,7 +57,7 @@ export const Header = ({
           </div>
         </Link>
 
-        <div className="flex flex-1 items-center justify-end gap-4 max-w-2xl mx-auto px-4">
+        <div className="flex items-center gap-4">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
