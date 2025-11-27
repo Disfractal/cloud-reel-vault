@@ -33,6 +33,8 @@ export interface AutoModel {
   productionStartYear?: number;
   productionEndYear?: number;
   uppercase?: boolean;
+  videoUrl?: string;
+  encodingState?: string;
   updatedOn: Timestamp;
   createdOn: Timestamp;
 }
