@@ -13,6 +13,7 @@ import Users from "./pages/Users";
 import UserDetail from "./pages/UserDetail";
 import InitAdmin from "./pages/InitAdmin";
 import AuditLogs from "./pages/AuditLogs";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/init-admin" element={<InitAdmin />} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
             <Route path="/user/:userId" element={<ProtectedRoute><UserDetail /></ProtectedRoute>} />
             <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
