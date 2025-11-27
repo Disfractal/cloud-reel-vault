@@ -6,7 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import { getDocument, collections, updateDocument } from "@/lib/firestore-helpers";
 import type { AutoModel } from "@/types/firestore";
 import VideoUpload from "@/components/VideoUpload";
-import VideoPlayer from "@/components/VideoPlayer";
 import { useAuth } from "@/contexts/AuthContext";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -47,12 +46,6 @@ const ModelDetail = () => {
     };
 
     fetchModel();
-
-    // Set up interval to refresh data every 5 seconds
-    const intervalId = setInterval(fetchModel, 5000);
-
-    // Clean up interval on unmount
-    return () => clearInterval(intervalId);
   }, [modelId, toast]);
 
   const handleUppercaseToggle = async (checked: boolean) => {
@@ -132,22 +125,18 @@ const ModelDetail = () => {
               </div>
               {isAdmin && (
                 <div className="flex flex-col gap-4">
-                  {(model as any).encodingState && (model as any).encodingState !== 'complete' ? (
-                    <Label className="text-muted-foreground">Video Processing</Label>
-                  ) : (
-                    <VideoUpload
-                      modelId={model.id}
-                      modelName={model.name}
-                      currentVideoUrl={(model as any).videoUrl}
-                      onUploadComplete={() => {
-                        if (modelId) {
-                          getDocument<AutoModel>(collections.autoModels, modelId).then(updated => {
-                            if (updated) setModel(updated);
-                          });
-                        }
-                      }}
-                    />
-                  )}
+                  <VideoUpload
+                    modelId={model.id}
+                    modelName={model.name}
+                    currentVideoUrl={(model as any).videoUrl}
+                    onUploadComplete={() => {
+                      if (modelId) {
+                        getDocument<AutoModel>(collections.autoModels, modelId).then(updated => {
+                          if (updated) setModel(updated);
+                        });
+                      }
+                    }}
+                  />
                   <div className="flex items-center gap-2">
                     <Switch
                       id="uppercase-toggle"
@@ -162,15 +151,6 @@ const ModelDetail = () => {
                 </div>
               )}
             </div>
-
-            {(model as any).encodingState === 'complete' && (model as any).videoUrl && (
-              <div className="mt-8">
-                <VideoPlayer 
-                  videoUrl={`https://storage.googleapis.com/dev-autospotr-videos/model-videos-rendered/${model.id}/manifest.m3u8`}
-                  modelName={model.name}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>
