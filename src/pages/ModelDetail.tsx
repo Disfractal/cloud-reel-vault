@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getDocument, collections, updateDocument } from "@/lib/firestore-helpers";
 import type { AutoModel } from "@/types/firestore";
 import VideoUpload from "@/components/VideoUpload";
+import VideoPlayer from "@/components/VideoPlayer";
 import { useAuth } from "@/contexts/AuthContext";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -155,6 +156,15 @@ const ModelDetail = () => {
                 </div>
               )}
             </div>
+
+            {(model as any).encodingState === 'complete' && (model as any).videoUrl && (
+              <div className="mt-8">
+                <VideoPlayer 
+                  videoUrl={(model as any).videoUrl} 
+                  modelName={model.name}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
