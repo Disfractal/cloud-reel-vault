@@ -71,15 +71,6 @@ export const Header = ({
           
           {user ? (
             <>
-              {isAdmin && (
-                <Link to="/content">
-                  <Button variant="outline" className="gap-2">
-                    <Database className="h-4 w-4" />
-                    <span className="hidden sm:inline">Content</span>
-                  </Button>
-                </Link>
-              )}
-              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
