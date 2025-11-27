@@ -166,7 +166,7 @@ const ModelDetail = () => {
             {(model as any).encodingState === 'complete' && (model as any).videoUrl && (
               <div className="mt-8">
                 <VideoPlayer 
-                  videoUrl={(model as any).videoUrl} 
+                  videoUrl={`https://storage.googleapis.com/dev-autospotr-videos/model-videos-rendered/${model.id}/manifest.m3u8`}
                   modelName={model.name}
                 />
               </div>
