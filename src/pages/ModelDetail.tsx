@@ -125,18 +125,22 @@ const ModelDetail = () => {
               </div>
               {isAdmin && (
                 <div className="flex flex-col gap-4">
-                  <VideoUpload
-                    modelId={model.id}
-                    modelName={model.name}
-                    currentVideoUrl={(model as any).videoUrl}
-                    onUploadComplete={() => {
-                      if (modelId) {
-                        getDocument<AutoModel>(collections.autoModels, modelId).then(updated => {
-                          if (updated) setModel(updated);
-                        });
-                      }
-                    }}
-                  />
+                  {(model as any).encodingState && (model as any).encodingState !== 'complete' ? (
+                    <Label className="text-muted-foreground">Video Processing</Label>
+                  ) : (
+                    <VideoUpload
+                      modelId={model.id}
+                      modelName={model.name}
+                      currentVideoUrl={(model as any).videoUrl}
+                      onUploadComplete={() => {
+                        if (modelId) {
+                          getDocument<AutoModel>(collections.autoModels, modelId).then(updated => {
+                            if (updated) setModel(updated);
+                          });
+                        }
+                      }}
+                    />
+                  )}
                   <div className="flex items-center gap-2">
                     <Switch
                       id="uppercase-toggle"
