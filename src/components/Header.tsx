@@ -72,28 +72,12 @@ export const Header = ({
           {user ? (
             <>
               {isAdmin && (
-                <>
-                  <Link to="/admin">
-                    <Button variant="outline" className="gap-2">
-                      <Settings className="h-4 w-4" />
-                      <span className="hidden sm:inline">Admin</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link to="/users">
-                    <Button variant="outline" className="gap-2">
-                      <Users className="h-4 w-4" />
-                      <span className="hidden sm:inline">Users</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link to="/audit-logs">
-                    <Button variant="outline" className="gap-2">
-                      <FileText className="h-4 w-4" />
-                      <span className="hidden sm:inline">Audit Logs</span>
-                    </Button>
-                  </Link>
-                </>
+                <Link to="/admin">
+                  <Button variant="outline" className="gap-2">
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </Button>
+                </Link>
               )}
               
               <DropdownMenu>
