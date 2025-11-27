@@ -1,4 +1,4 @@
-import { Cloud, Search, LogOut, User, Users, FileText } from "lucide-react";
+import { Cloud, Search, LogOut, User, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -34,7 +34,7 @@ export const Header = ({
         title: "Logged out",
         description: "You have been successfully logged out.",
       });
-      navigate("/");
+      navigate("/auth");
     } catch (error) {
       toast({
         title: "Error",
@@ -71,18 +71,11 @@ export const Header = ({
           
           {user ? (
             <>
-              <Link to="/users">
-                <Button variant="outline" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">Users</span>
-                </Button>
-              </Link>
-              
               {isAdmin && (
-                <Link to="/audit-logs">
+                <Link to="/">
                   <Button variant="outline" className="gap-2">
-                    <FileText className="h-4 w-4" />
-                    <span className="hidden sm:inline">Audit Logs</span>
+                    <ShieldCheck className="h-4 w-4" />
+                    <span className="hidden sm:inline">Admin</span>
                   </Button>
                 </Link>
               )}
