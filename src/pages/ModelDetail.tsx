@@ -47,6 +47,12 @@ const ModelDetail = () => {
     };
 
     fetchModel();
+
+    // Set up interval to refresh data every 5 seconds
+    const intervalId = setInterval(fetchModel, 5000);
+
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
   }, [modelId, toast]);
 
   const handleUppercaseToggle = async (checked: boolean) => {
