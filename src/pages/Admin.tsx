@@ -19,6 +19,22 @@ const Admin = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link to="/">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Database className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>Content Management</CardTitle>
+                </div>
+                <CardDescription>
+                  Manage car makes, models, and media assets
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+
           <Link to="/users">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
@@ -46,22 +62,6 @@ const Admin = () => {
                 </div>
                 <CardDescription>
                   Review security events and system activity logs
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Link to="/">
-            <Card className="hover:bg-accent transition-colors cursor-pointer">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Database className="h-6 w-6 text-primary" />
-                  </div>
-                  <CardTitle>Content Management</CardTitle>
-                </div>
-                <CardDescription>
-                  Manage car makes, models, and media assets
                 </CardDescription>
               </CardHeader>
             </Card>
