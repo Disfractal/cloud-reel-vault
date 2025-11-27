@@ -8,6 +8,9 @@ steps:
   args: ['-c', 'rm -rf node_modules package-lock.json || true && npm install']
 
 - name: 'gcr.io/cloud-builders/npm'
+  args: ['install', '@rollup/rollup-linux-x64-gnu', '--save-optional']
+
+- name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build'] 
   
 # Or your specific build command
