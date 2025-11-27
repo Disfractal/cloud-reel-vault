@@ -1,4 +1,4 @@
-import { Cloud, Search, LogOut, User, Users, FileText, Settings } from "lucide-react";
+import { Cloud, Search, LogOut, User, Users, FileText, Settings, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -72,10 +72,10 @@ export const Header = ({
           {user ? (
             <>
               {isAdmin && (
-                <Link to="/admin">
+                <Link to="/content">
                   <Button variant="outline" className="gap-2">
-                    <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline">Admin</span>
+                    <Database className="h-4 w-4" />
+                    <span className="hidden sm:inline">Content</span>
                   </Button>
                 </Link>
               )}

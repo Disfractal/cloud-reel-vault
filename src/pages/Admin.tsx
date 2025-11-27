@@ -19,7 +19,7 @@ const Admin = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link to="/">
+          <Link to="/content">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
                 <div className="flex items-center gap-3">
