@@ -4,6 +4,13 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
+
+// Work around npm optional dependency bug for Rollup native binaries
+// See error: "Cannot find module '@rollup/rollup-linux-x64-gnu'"
+if (!process.env.ROLLUP_DISABLE_NATIVE) {
+  process.env.ROLLUP_DISABLE_NATIVE = "true";
+}
+
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
