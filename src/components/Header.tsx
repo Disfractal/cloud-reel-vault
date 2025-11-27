@@ -1,4 +1,4 @@
-import { Cloud, Search, LogOut, User, Users, FileText } from "lucide-react";
+import { Cloud, Search, LogOut, User, Users, FileText, Settings, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -57,7 +57,7 @@ export const Header = ({
           </div>
         </Link>
 
-        <div className="flex flex-1 items-center justify-end gap-4 max-w-2xl mx-auto px-4">
+        <div className="flex items-center gap-4">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -71,22 +71,6 @@ export const Header = ({
           
           {user ? (
             <>
-              <Link to="/users">
-                <Button variant="outline" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">Users</span>
-                </Button>
-              </Link>
-              
-              {isAdmin && (
-                <Link to="/audit-logs">
-                  <Button variant="outline" className="gap-2">
-                    <FileText className="h-4 w-4" />
-                    <span className="hidden sm:inline">Audit Logs</span>
-                  </Button>
-                </Link>
-              )}
-              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
