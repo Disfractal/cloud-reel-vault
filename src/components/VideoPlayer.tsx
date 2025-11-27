@@ -23,8 +23,15 @@ const VideoPlayer = ({ videoUrl, modelName }: VideoPlayerProps) => {
       preload: "auto",
       sources: [{
         src: videoUrl,
-        type: "video/mp4"
-      }]
+        type: "application/x-mpegURL"
+      }],
+      html5: {
+        vhs: {
+          overrideNative: true
+        },
+        nativeAudioTracks: false,
+        nativeVideoTracks: false
+      }
     });
 
     playerRef.current = player;
